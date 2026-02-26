@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  gateway:
+    build: ./gateway
+    ports:
+      - "5000:3000"
+    environment:
+      - PORT=3000
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - COURSE_SERVICE_URL=http://course-service:3002
+      - ENROLLMENT_SERVICE_URL=http://enrollment-service:3003
+      - ASSESSMENT_SERVICE_URL=http://assessment-service:3004
+    depends_on:
+      - auth-service
+      - course-service
+      - enrollment-service
+      - assessment-service
+
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - MONGO_URI=mongodb://mongodb:27017/auth_db
+      - JWT_SECRET=supersecretkey
+    depends_on:
+      - mongodb
+
+  course-service:
+    build: ./course-service
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - MONGO_URI=mongodb://mongodb:27017/course_db
+    depends_on:
+      - mongodb
+
+  enrollment-service:
+    build: ./enrollment-service
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - MONGO_URI=mongodb://mongodb:27017/enrollment_db
+    depends_on:
+      - mongodb
+
+  assessment-service:
+    build: ./assessment-service
+    ports:
+      - "3004:3004"
+    environment:
+      - PORT=3004
+      - MONGO_URI=mongodb://mongodb:27017/assessment_db
+    depends_on:
+      - mongodb
+
+volumes:
+  mongodb_data:
