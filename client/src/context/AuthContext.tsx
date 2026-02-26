@@ -20,7 +20,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const savedUser = localStorage.getItem('user');
         const token = localStorage.getItem('token');
         if (savedUser && token) {
-            setUser(JSON.parse(savedUser));
+            try {
+                setUser(JSON.parse(savedUser));
+            } catch (e) {
+                console.error('AuthContext: Error parsing saved user:', e);
+            }
         }
         setLoading(false);
     }, []);

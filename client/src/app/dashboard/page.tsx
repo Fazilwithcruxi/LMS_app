@@ -6,67 +6,69 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 
 export default function Dashboard() {
-    const { user, logout, loading } = useAuth();
-    const router = useRouter();
+  const { user, logout, loading } = useAuth();
+  const router = useRouter();
 
-    useEffect(() => {
-        if (!loading && !user) {
-            router.push('/login');
-        }
-    }, [user, loading, router]);
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
 
-    if (loading || !user) return <div className="loading">Loading...</div>;
+  if (loading || !user) {
+    return <div className="loading">Loading...</div>;
+  }
 
-    return (
-        <div className="dashboard-layout">
-            {/* Sidebar */}
-            <aside className="sidebar glass-card">
-                <div className="logo-section">
-                    <span className="gradient-text">Lumina</span>LMS
-                </div>
-                <nav className="side-nav">
-                    <Link href="/dashboard" className="nav-item active">Overview</Link>
-                    <Link href="/courses" className="nav-item">My Courses</Link>
-                    <Link href="/profile" className="nav-item">Profile</Link>
-                    {user.role === 'instructor' && (
-                        <Link href="/courses/create" className="nav-item instructor-action">Create Course</Link>
-                    )}
-                </nav>
-                <button onClick={logout} className="logout-btn">Logout</button>
-            </aside>
+  return (
+    <div className="dashboard-layout">
+      {/* Sidebar */}
+      <aside className="sidebar glass-card">
+        <div className="logo-section">
+          <span className="gradient-text">Lumina</span>LMS
+        </div>
+        <nav className="side-nav">
+          <Link href="/dashboard" className="nav-item active">Overview</Link>
+          <Link href="/courses" className="nav-item">My Courses</Link>
+          <Link href="/profile" className="nav-item">Profile</Link>
+          {user.role === 'instructor' && (
+            <Link href="/courses/create" className="nav-item instructor-action">Create Course</Link>
+          )}
+        </nav>
+        <button onClick={logout} className="logout-btn">Logout</button>
+      </aside>
 
-            {/* Main Content */}
-            <main className="main-content">
-                <header className="dashboard-header">
-                    <h1>Welcome, {user.name}</h1>
-                    <div className="user-badge">{user.role}</div>
-                </header>
+      {/* Main Content */}
+      <main className="main-content">
+        <header className="dashboard-header">
+          <h1>Welcome, {user.name}</h1>
+          <div className="user-badge">{user.role}</div>
+        </header>
 
-                <section className="stats-grid">
-                    <div className="stat-card glass-card">
-                        <h3>Courses Enrolled</h3>
-                        <div className="stat-value">0</div>
-                    </div>
-                    <div className="stat-card glass-card">
-                        <h3>Progress</h3>
-                        <div className="stat-value">0%</div>
-                    </div>
-                    <div className="stat-card glass-card">
-                        <h3>Achievements</h3>
-                        <div className="stat-value">🏆</div>
-                    </div>
-                </section>
+        <section className="stats-grid">
+          <div className="stat-card glass-card">
+            <h3>Courses Enrolled</h3>
+            <div className="stat-value">0</div>
+          </div>
+          <div className="stat-card glass-card">
+            <h3>Progress</h3>
+            <div className="stat-value">0%</div>
+          </div>
+          <div className="stat-card glass-card">
+            <h3>Achievements</h3>
+            <div className="stat-value">🏆</div>
+          </div>
+        </section>
 
-                <section className="content-section">
-                    <h2>Recent Activity</h2>
-                    <div className="glass-card empty-state">
-                        <p>No activity yet. Start your journey today!</p>
-                        <Link href="/courses" className="btn-primary">Browse Courses</Link>
-                    </div>
-                </section>
-            </main>
+        <section className="content-section">
+          <h2>Recent Activity</h2>
+          <div className="glass-card empty-state">
+            <p>No activity yet. Start your journey today!</p>
+            <Link href="/courses" className="btn-primary">Browse Courses</Link>
+          </div>
+        </section>
+      </main>
 
-            <style jsx>{`
+      <style jsx>{`
         .dashboard-layout {
           display: flex;
           min-height: 100vh;
@@ -179,6 +181,6 @@ export default function Dashboard() {
           font-size: 1.5rem;
         }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 }
