@@ -63,6 +63,15 @@ export default function CourseDetail({ params }: { params: Promise<{ id: string 
   if (loading || fetching) return <div className="loading">Loading details...</div>;
   if (!course) return <div className="error-container">Course not found.</div>;
 
+  const defaultImages = [
+    "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1587620962725-abab7fe55159?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80"
+  ];
+  const bgImage = course.thumbnail || defaultImages[(course.title ? course.title.length : 0) % defaultImages.length];
+
   return (
     <div className="detail-page">
       <nav className="catalog-nav container">
@@ -95,7 +104,10 @@ export default function CourseDetail({ params }: { params: Promise<{ id: string 
               )}
             </div>
           </div>
-          <div className="hero-banner glass-card" style={{ background: 'var(--accent-gradient)' }}></div>
+          <div
+            className="hero-banner glass-card"
+            style={{ backgroundImage: `url("${bgImage}")`, backgroundPosition: 'center', backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}
+          ></div>
         </div>
 
         <section className="curriculum-section">

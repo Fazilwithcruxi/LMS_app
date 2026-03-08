@@ -3,15 +3,38 @@
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function ProfilePage() {
     const { user, loading, logout } = useAuth();
     const router = useRouter();
 
+    const [emailNotifs, setEmailNotifs] = useState(true);
+    const [publicProfile, setPublicProfile] = useState(true);
+    const [darkMode, setDarkMode] = useState(true);
+
+    const [stats, setStats] = useState({ courses: 0, progress: 0, certificates: 0 });
+
     useEffect(() => {
         if (!loading && !user) {
             router.push('/login');
+        } else if (user) {
+            const fetchStats = async () => {
+                try {
+                    const res = await fetch(`http://localhost:5000/api/enrollments/student/${user.id}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        setStats((prev: any) => ({
+                            ...prev,
+                            courses: data.length,
+                            progress: data.length > 0 ? Math.floor(data.reduce((acc: any, curr: any) => acc + (curr.progress || 0), 0) / data.length) : 0
+                        }));
+                    }
+                } catch (err) {
+                    console.error('Error fetching stats:', err);
+                }
+            };
+            fetchStats();
         }
     }, [user, loading, router]);
 
@@ -47,15 +70,15 @@ export default function ProfilePage() {
                         <h3>Learning Activity</h3>
                         <div className="stats-row">
                             <div className="stat-item">
-                                <span className="stat-value">12</span>
+                                <span className="stat-value">{stats.courses}</span>
                                 <span className="stat-label">Courses</span>
                             </div>
                             <div className="stat-item">
-                                <span className="stat-value">85%</span>
+                                <span className="stat-value">{stats.progress}%</span>
                                 <span className="stat-label">Avg. Progress</span>
                             </div>
                             <div className="stat-item">
-                                <span className="stat-value">4</span>
+                                <span className="stat-value">{stats.certificates}</span>
                                 <span className="stat-label">Certificates</span>
                             </div>
                         </div>
@@ -67,21 +90,34 @@ export default function ProfilePage() {
                             <div className="setting-item">
                                 <span>Email Notifications</span>
                                 <label className="switch">
-                                    <input type="checkbox" defaultChecked />
+                                    <input
+                                        type="checkbox"
+                                        checked={emailNotifs}
+                                        onChange={(e) => setEmailNotifs(e.target.checked)}
+                                    />
                                     <span className="slider"></span>
                                 </label>
                             </div>
                             <div className="setting-item">
                                 <span>Public Profile</span>
                                 <label className="switch">
-                                    <input type="checkbox" />
+                                    <input
+                                        type="checkbox"
+                                        checked={publicProfile}
+                                        onChange={(e) => setPublicProfile(e.target.checked)}
+                                    />
                                     <span className="slider"></span>
                                 </label>
                             </div>
                             <div className="setting-item">
                                 <span>Dark Mode</span>
                                 <label className="switch">
-                                    <input type="checkbox" defaultChecked disabled />
+                                    <input
+                                        type="checkbox"
+                                        checked={darkMode}
+                                        onChange={(e) => setDarkMode(e.target.checked)}
+                                        disabled
+                                    />
                                     <span className="slider"></span>
                                 </label>
                             </div>

@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 export default function CourseCatalog() {
   const { user, loading } = useAuth();
-  const [courses, setCourses] = useState([]);
+  const [courses, setCourses] = useState<any[]>([]);
   const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
@@ -25,6 +25,14 @@ export default function CourseCatalog() {
   }, []);
 
   if (loading || fetching) return <div className="loading">Loading courses...</div>;
+
+  const defaultImages = [
+    "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1587620962725-abab7fe55159?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80"
+  ];
 
   return (
     <div className="catalog-page">
@@ -45,20 +53,26 @@ export default function CourseCatalog() {
 
         <div className="course-grid">
           {courses.length > 0 ? (
-            courses.map((course: any) => (
-              <div key={course._id} className="course-card glass-card">
-                <div className="course-banner" style={{ background: 'var(--accent-gradient)' }}></div>
-                <div className="course-info">
-                  <span className="course-category">{course.category || 'General'}</span>
-                  <h3>{course.title}</h3>
-                  <p>{course.description.substring(0, 100)}...</p>
-                  <div className="course-footer">
-                    <span className="course-price">${course.price}</span>
-                    <Link href={`/courses/${course._id}`} className="btn-primary-sm">View Details</Link>
+            courses.map((course: any, index: number) => {
+              const bgImage = course.thumbnail || defaultImages[index % defaultImages.length];
+              return (
+                <div key={course._id} className="course-card glass-card">
+                  <div
+                    className="course-banner"
+                    style={{ backgroundImage: `url("${bgImage}")`, backgroundPosition: 'center', backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}
+                  ></div>
+                  <div className="course-info">
+                    <span className="course-category">{course.category || 'General'}</span>
+                    <h3>{course.title}</h3>
+                    <p>{course.description ? course.description.substring(0, 100) : 'No description available'}...</p>
+                    <div className="course-footer">
+                      <span className="course-price">${course.price}</span>
+                      <Link href={`/courses/${course._id}`} className="btn-primary-sm">View Details</Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              )
+            })
           ) : (
             <div className="empty-catalog glass-card">
               <p>No courses available at the moment. Check back later!</p>

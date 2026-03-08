@@ -2,16 +2,36 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 export default function Dashboard() {
   const { user, logout, loading } = useAuth();
   const router = useRouter();
 
+  const [stats, setStats] = useState({ courses: 0, progress: 0, achievements: 0 });
+
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
+    } else if (user) {
+      const fetchStats = async () => {
+        try {
+          const res = await fetch(`http://localhost:5000/api/enrollments/student/${user.id}`);
+          if (res.ok) {
+            const data = await res.json();
+            setStats((prev: any) => ({
+              ...prev,
+              courses: data.length,
+              progress: data.length > 0 ? Math.floor(data.reduce((acc: any, curr: any) => acc + (curr.progress || 0), 0) / data.length) : 0,
+              achievements: data.length > 0 ? 1 : 0
+            }));
+          }
+        } catch (err) {
+          console.error('Error fetching stats:', err);
+        }
+      };
+      fetchStats();
     }
   }, [user, loading, router]);
 
@@ -47,15 +67,15 @@ export default function Dashboard() {
         <section className="stats-grid">
           <div className="stat-card glass-card">
             <h3>Courses Enrolled</h3>
-            <div className="stat-value">0</div>
+            <div className="stat-value">{stats.courses}</div>
           </div>
           <div className="stat-card glass-card">
             <h3>Progress</h3>
-            <div className="stat-value">0%</div>
+            <div className="stat-value">{stats.progress}%</div>
           </div>
           <div className="stat-card glass-card">
             <h3>Achievements</h3>
-            <div className="stat-value">🏆</div>
+            <div className="stat-value">{stats.achievements} 🏆</div>
           </div>
         </section>
 
